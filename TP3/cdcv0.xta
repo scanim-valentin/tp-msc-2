@@ -1,0 +1,49 @@
+
+int  GFIR,  PFIR;
+int  GFRI,  PFRI;
+chan FIRGET, FIRPUT;
+chan FRIGET, FRIPUT;
+
+const int cr = 1;
+const int dr = 0;
+
+process resp(chan &get, chan &put, int &vput, int &vget){
+int[0,1] mesg;
+state idle, waitme, open, rns;
+urgent idle, waitme, open, rns;
+init idle;
+trans idle -> waitme{sync get?; assign mesg := vget; },
+waitme -> open{guard mesg == cr; sync put!; assign vput :=cr; },
+waitme -> idle{guard mesg == cr; sync put!; assign vput :=dr; },
+waitme -> rns{guard mesg != cr; };
+}
+
+process initia(chan &get, chan &put, int &vput, int &vget){
+int[0,1] mesg;
+state idle, waitother, open, rec_waitohter, rns;
+urgent idle, waitother, open, rec_waitohter,rns;
+init idle;
+trans idle -> waitother{sync put!; assign vput :=cr; },
+waitother -> rec_waitohter{sync get?; assign mesg := vget; },
+rec_waitohter -> open{guard mesg == cr; },
+rec_waitohter -> idle{guard mesg == dr; };
+}
+
+process fifo(const int cap, chan &get, chan &put, int &vput, int &vget){
+int cpt := 0;
+        int buf[cap];
+        int ixP := 0;
+        int ixG := 0;
+state service, error;
+urgent service, error;
+init service;
+trans service -> service{guard cpt > 0; sync get!; assign vget:= buf[ixG], cpt:= cpt - 1, 
+                   ixG:= (ixG == (cap - 1))?0:(ixG + 1); },
+service -> service{guard cpt < cap; sync put?; assign buf[ixP]:= vput, 
+                   cpt:= cpt + 1, ixP:= (ixP == (cap - 1))?0:(ixP + 1); },
+service -> error{guard cpt == cap; sync put?; };
+}
+FifoIR  := fifo(4,FIRGET,FIRPUT,PFIR,GFIR);
+FifoRI  := fifo(4,FRIGET,FRIPUT,PFRI,GFRI);
+repondeur := resp(FIRGET,FRIPUT,PFRI,GFIR);
+initiateur := initia(FRIGET,FIRPUT,PFIR,GFRI);system initiateur, FifoIR, FifoRI,  repondeur;
