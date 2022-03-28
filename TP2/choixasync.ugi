@@ -1,22 +1,33 @@
 process site graphinfo {
+guard apres_recoit idle 1 (-75,-35);
+assign apres_recoit idle 1 (-85,0);
 location idle (40,80);
 locationName idle(-10,-30);
-location apres_envoi (190,80);
+location apres_envoi (-68,-85);
 locationName apres_envoi(-10,-30);
-location apres_recoit (190,230);
+location apres_recoit (246,161);
 locationName apres_recoit(-10,-30);
-sync idle apres_envoi 1 (-60,-15);
-assign idle apres_envoi 1 (-60,0);
-sync idle apres_recoit 1 (-60,-15);
-assign idle apres_recoit 1 (-60,0);
+trans idle apres_envoi 1 (-71,70);
+guard idle apres_envoi 1 (-173,10);
+sync idle apres_envoi 1 (-156,36);
+assign idle apres_envoi 1 (-181,70);
+trans idle apres_recoit 1 (18,-86);
+sync idle apres_recoit 1 (78,-95);
+assign idle apres_recoit 1 (61,-69);
+trans apres_envoi idle 1 (107,-15);
+assign apres_envoi idle 1 (22,-74);
+trans apres_recoit idle 2 (-50,58);
+guard apres_recoit idle 2 (-75,67);
+sync apres_recoit idle 2 (-50,33);
+assign apres_recoit idle 2 (-75,92);
 }
 process fifo graphinfo {
-guard service erreur 1 (-98,-34);
-sync service erreur 1 (-98,-17);
 location service (-42,34);
 locationName service(-10,-30);
 location erreur (190,80);
 locationName erreur(-10,-30);
+guard service erreur 1 (-98,-34);
+sync service erreur 1 (-98,-17);
 trans service service 1 (-255,221);
 trans service service 1 (-119,323);
 guard service service 1 (-94,106);

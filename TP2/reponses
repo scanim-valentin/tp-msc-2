@@ -1,0 +1,3 @@
+Signingication: 
+A[] not deadlock : "pour tout état pour toute transition, aucun blocage"
+E<> gauche.apres_recoit and droit.apres_recoit : "il existe un moyen d'arriver à l'état gauche.apres_recoit et droit.apres reçoit en même temps"
