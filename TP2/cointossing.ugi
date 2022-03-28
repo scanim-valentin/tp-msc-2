@@ -1,0 +1,74 @@
+process fifo graphinfo {
+location service (-110,102);
+locationName service(59,-8);
+location erreur (-127,170);
+locationName erreur(25,-9);
+trans service service 1 (237,-68);
+trans service service 1 (93,-93);
+guard service service 1 (263,-68);
+sync service service 1 (272,-51);
+assign service service 1 (204,-118);
+trans service service 2 (-187,-135);
+trans service service 2 (-136,-170);
+guard service service 2 (-234,-164);
+sync service service 2 (-92,-143);
+assign service service 2 (-475,-135);
+guard service erreur 1 (8,42);
+sync service erreur 1 (25,0);
+}
+process player graphinfo {
+guard S1 repos 1 (-101,-34);
+sync S1 repos 1 (-101,-17);
+trans S0 repos 1 (-140,-98);
+guard S0 repos 1 (-122,-119);
+sync S0 repos 1 (-122,-102);
+trans S1 repos 2 (51,119);
+guard S1 repos 2 (-92,25);
+sync S1 repos 2 (-92,42);
+guard S0 repos 2 (-14,-34);
+sync S0 repos 2 (13,-13);
+guard S2 S1 1 (-115,-22);
+guard S2 S0 1 (-102,-9);
+location S0 (-255,-280);
+location S1 (-161,-102);
+assign S3 S2 1 (-81,-9);
+location S2 (0,-195);
+sync S4 S3 1 (13,-26);
+assign S4 S3 1 (-20,0);
+sync S5 S3 1 (-58,-17);
+assign S5 S3 1 (-58,0);
+location S3 (212,-127);
+sync idle S4 1 (22,4);
+assign idle S4 1 (-21,30);
+location S4 (289,-8);
+sync idle S5 1 (-49,-17);
+assign idle S5 1 (-93,4);
+location S5 (59,-42);
+location repos (-399,-136);
+locationName repos(-10,-30);
+location idle (144,85);
+locationName idle(-10,-30);
+trans repos idle 1 (-85,263);
+sync repos idle 1 (-102,289);
+}
+process site graphinfo {
+location idle (40,80);
+locationName idle(-10,-30);
+location wait (190,80);
+locationName wait(-10,-30);
+location envoi (-85,-42);
+locationName envoi(-10,-30);
+location apres_envoi (-229,136);
+locationName apres_envoi(-10,-30);
+location recoit (340,80);
+locationName recoit(-10,-30);
+location apres_recoit (340,230);
+locationName apres_recoit(-10,-30);
+sync idle wait 1 (-60,-15);
+sync wait envoi 1 (58,6);
+sync wait recoit 1 (-60,-15);
+sync envoi apres_envoi 1 (4,91);
+assign envoi apres_envoi 1 (4,106);
+sync recoit apres_recoit 1 (-60,-15);
+assign recoit apres_recoit 1 (-60,0);
+}
