@@ -1,0 +1,63 @@
+
+int  GFIR,  PFIR;
+int  GFRI,  PFRI;
+chan FIRGET, FIRPUT;
+chan FRIGET, FRIPUT;
+
+const int close = 2;
+const int cr = 1;
+const int dr = 0;
+
+process cl(chan &get, chan &put, int &vput, int &vget) {
+int[0,1] mesg;
+state
+    get_mesg,
+    idle,
+    waitme,
+    open,
+    rns;
+urgent
+    idle,
+    waitme,
+    open,
+    rns;
+init idle;
+trans
+    idle -> idle { sync put!; assign vput:=cr;  },
+    waitme -> waitme { sync get!; assign mesg:=vget;  },
+    get_mesg -> rns { guard mesg!=dr;  },
+    get_mesg -> idle { guard mesg==dr;  },
+    open -> get_mesg { sync get?; assign mesg:=vget;  },
+    rns -> idle {  },
+    open -> idle { sync put!; assign vput:=dr;  },
+    idle -> waitme { sync get?; assign mesg := vget;  },
+    waitme -> open { guard mesg == cr; sync put!; assign vput :=cr;  },
+    waitme -> idle { guard mesg == cr; sync put!; assign vput :=dr;  },
+    waitme -> rns { guard mesg != cr;  };
+}
+
+process fifo(const int cap, chan &get, chan &put, int &vput, int &vget) {
+int cpt := 0;
+        int buf[cap];
+        int ixP := 0;
+        int ixG := 0;
+state
+    service,
+    error;
+urgent
+    service,
+    error;
+init service;
+trans
+    service -> service { guard cpt > 0; sync get!; assign vget:= buf[ixG], cpt:= cpt - 1, 
+                   ixG:= (ixG == (cap - 1))?0:(ixG + 1);  },
+    service -> service { guard cpt < cap; sync put?; assign buf[ixP]:= vput, 
+                   cpt:= cpt + 1, ixP:= (ixP == (cap - 1))?0:(ixP + 1);  },
+    service -> error { guard cpt == cap; sync put?;  };
+}
+FifoIR  := fifo(4,FIRGET,FIRPUT,PFIR,GFIR);
+FifoRI  := fifo(4,FRIGET,FRIPUT,PFRI,GFRI);
+client1 := cl(FIRGET,FRIPUT,PFRI,GFIR);
+client2 := cl(FIRGET,FRIPUT,PFRI,GFIR);
+
+system client1, FifoIR, FifoRI,  client2;
